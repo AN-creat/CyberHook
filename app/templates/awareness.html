@@ -1,0 +1,113 @@
+<!-- awareness.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>صفحة التوعية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f5f8fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 { color: #005588; margin-bottom: 20px; }
+        p { font-size: 18px; margin-bottom: 20px; }
+        a.button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            iframe { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🚨 تنبيه: لقد وقعت ضحية لهجوم تصيّد!</h1>
+        <p>هذا مثال توعوي ضمن حملة داخلية لزيادة الوعي بالأمن السيبراني في شركتنا.</p>
+
+        <p>نرجو منك زيارة الرابط التالي للتعرّف أكثر على طرق التصيّد وكيفية تجنبه:</p>
+
+        <a id="link1" class="button" href="https://nca.gov.sa/ar/cyber-awareness/awareness-campaigns/october-2024-campaign/" target="_blank">
+            صفحة التوعية من الهيئة الوطنية للأمن السيبراني 
+        </a>
+
+        <a id="link2" class="button" href="https://nca.gov.sa/ar/quiz/1a3a4792-f51e-4305-92c2-5e4eeb5df6f8/" target="_blank">
+            صفحة لاختبار وعيك في التصيد الالكتروني
+        </a>
+
+        <p>📺 يمكنك أيضًا مشاهدة هذا الفيديو التوعوي القصير:</p>
+
+        <iframe id="videoFrame" src="https://www.youtube.com/embed/3YWmwNHeJ5s?si=56SRWUQ5F360kON2" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // الدالة ترسل طلب "تم التوعية"
+        function sendAwarenessUpdate() {
+            fetch("/complete_awareness", {
+                method: "POST"
+            }).then(() => {
+                console.log("تم تحديث حالة التوعية");
+            }).catch(err => {
+                console.error("خطأ في تحديث التوعية:", err);
+            });
+        }
+
+        // عند الضغط على أي رابط نرسل التحديث
+        document.getElementById("link1").addEventListener("click", sendAwarenessUpdate);
+        document.getElementById("link2").addEventListener("click", sendAwarenessUpdate);
+
+        // رصد تشغيل الفيديو في iframe (باستخدام YouTube API)
+        // تحتاج تضمين YouTube IFrame API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('videoFrame', {
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // حالة الفيديو عند التشغيل (1 يعني بدأ التشغيل)
+        function onPlayerStateChange(event) {
+            if(event.data == YT.PlayerState.PLAYING) {
+                sendAwarenessUpdate();
+                // لمنع التكرار، يمكن إزالة الحدث بعد أول تشغيل
+                player.removeEventListener('onStateChange', onPlayerStateChange);
+            }
+        }
+    </script>
+
+</body>
+</html>

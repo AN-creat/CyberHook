@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8" />
+    <title>لوحة تحكم المشرف</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons (لأيقونة العين) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <style>
+        body {
+            background: linear-gradient(to right, #0f2027, #3c8848, #194b28);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f1f1f1;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .dashboard-header {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .table {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background-color: rgba(0,0,0,0.7);
+            color: #00ff99;
+        }
+
+        .table td, .table th {
+            color: #0d0d0d;
+            background-color: rgba(255,255,255,0.9);
+        }
+
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.986);
+            color: #080808;
+            border:1px solid #ccc;
+        }
+
+        .form-control:focus {
+            background-color: rgba(255,255,255,0.2);
+            color: #f8f7f7;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background-color: #00ff99;
+            color: #000;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #00cc7a;
+        }
+
+        .btn-success {
+            background-color: #00ff99 !important;
+            border: none;
+            color: #000;
+        }
+
+        .btn-danger {
+            border: none;
+        }
+
+        .card {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* مودال - خلفية داكنة */
+        .modal-content {
+            background-color: rgba(0,0,0,0.9);
+            color: #fff;
+        }
+
+        .modal-header, .modal-footer {
+            border: none;
+        }
+
+        .dataTables_paginate .paginate_button {
+           margin: 0 5px;
+        }
+
+        /* تعديل مدخل البين داخل المودال ليكون واضحاً على الخلفية الداكنة */
+        .modal-content .form-control {
+            background-color: rgba(255,255,255,0.06);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .modal-content .form-control::placeholder { color: #cfcfcf; }
+
+        /* زر العين داخل الـ input-group */
+        .input-group .btn-outline-light {
+            color: #fff;
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        /* نضمن أن زر الإغلاق يظهر في الزاوية اليسار */
+        .modal-header {
+            display: flex;
+            align-items: center;
+        }
+        /* نجعل زر الإغلاق يتحرك إلى اليسار */
+        .modal-header .btn-close {
+            margin-left: auto;
+            margin-right: 0;
+            filter: invert(1); /* يظهر أبيض */
+        }
+
+        /* رسالة الخطأ داخل المودال */
+        .modal .alert { margin-bottom: 0; }
+
+    </style>
+</head>
+<body dir="rtl">
+
+<div class="container mt-4">
+    <div class="dashboard-header text-center">
+        <h2>📊 لوحة تحكم المشرف</h2>
+        <p class="mb-0">عرض معلومات ضحايا حملة التصيّد</p>
+    </div>
+
+    <form method="get" action="{{ url_for('main.dashboard') }}" class="mb-3 d-flex gap-2 justify-content-center">
+        <input type="text" name="search" placeholder="ابحث بالإيميل أو اسم المستخدم" value="{{ search_query }}" class="form-control" style="max-width: 300px;" />
+        <button type="submit" class="btn btn-primary">بحث</button>
+    </form>
+
+    {% if victims %}
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle text-center" id="victimsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                     <th>رقم الجوال</th>
+                    <th>وقت التسجيل</th>
+                    <th>فتح الرابط</th>
+                    <th>تعرض لتصيد</th>
+                    <th>تم التوعية؟</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for victim in victims %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ victim.username }}</td>
+                    <td>{{ victim.masked_email }}</td>
+                    <td>{{ victim.masked_phone }}</td>
+                    <td><small class="text-muted">{{ victim.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                    <td>
+                        <span class="badge bg-primary badge-clicks">{{ victim.link_clicks }}</span>
+                    </td>
+                    <td>
+                        {% if victim.phishing_count > 1 %}
+                            <span class="badge bg-danger">{{ victim.phishing_count }} مرات</span>
+                        {% else %}
+                            <span class="badge bg-success">مرة واحدة</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if victim.awareness_completed %}
+                            ✅
+                        {% else %}
+                            ❌
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+            لا يوجد بيانات لعرضها حاليًا.
+        </div>
+    {% endif %}
+</div>
+
+<div style="max-width: 300px; margin: 30px auto;">
+  <div class="card border-success mb-3 p-3">
+    <div style="color: #00ff99; font-weight: bold; margin-bottom: 10px;">📊 تحميل النتائج</div>
+    <p>يمكنك تحميل بيانات التفاعل بصيغتين </p>
+    <button type="button" class="btn btn-success w-100 mb-2" id="downloadCsvBtn">
+      تحميل ملف CSV
+    </button>
+    <button type="button" class="btn btn-success w-100" id="downloadXlsxBtn">
+      تحميل ملف XLSX
+    </button>
+    <a href="{{ url_for('main.logout') }}" class="btn btn-danger mt-3 w-100">تسجيل خروج</a>
+  </div>
+</div>
+
+<!-- مودال طلب كلمة السر -->
+<!-- نافذة منبثقة (Modal) لطلب PIN -->
+<div class="modal fade" id="pinModal" tabindex="-1" aria-labelledby="pinModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center position-relative">
+        <h5 class="modal-title" id="pinModalLabel" style="margin: 0 auto;">التحقق بكلمة السر</h5>
+        <button type="button" class="btn-close position-absolute start-0" data-bs-dismiss="modal" aria-label="إغلاق" style="top: 50%; transform: translateY(-50%);"></button>
+      </div>
+
+      <form id="pinForm" method="POST">
+        <div class="modal-body">
+          <input type="password" name="pin" id="pinInput" class="form-control" placeholder="أدخل كلمة السر" required autofocus />
+              <div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display:none;"></div>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn" 
+                  style="background-color: #28a745; color: white; border-radius: 20px; width: 100%;">
+            تأكيد
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- المكتبات الخارجية -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    let downloadUrl = '';  // رابط التحميل (سيتم تغييره حسب الزر)
+    // عند فتح المودال نظف رسالة الخطأ
+    $('#downloadCsvBtn').click(function() {
+        downloadUrl = "{{ url_for('main.download_csv') }}";
+        $('#errorAlert').html('').hide().removeClass('show');
+        $('#pinInput').val('');
+        new bootstrap.Modal(document.getElementById('pinModal')).show();
+    });
+    $('#downloadXlsxBtn').click(function() {
+        downloadUrl = "{{ url_for('main.download_xlsx') }}";
+        $('#errorAlert').html('').hide().removeClass('show');
+        $('#pinInput').val('');
+        new bootstrap.Modal(document.getElementById('pinModal')).show();
+    });
+
+    // عند إغلاق المودال (أي زر إغلاق أو غيره) نخفي رسالة الخطأ فوراً
+    $('#pinModal').on('hidden.bs.modal', function () {
+        $('#errorAlert').text('').hide().removeClass('show');
+    });
+
+    
+
+    // إرسال الفورم وكشف الخطأ
+    $('#pinForm').submit(function(e) {
+        e.preventDefault();
+        $('#errorAlert').text('').hide().removeClass('show');
+
+        var pin = $('#pinInput').val();
+
+        $.ajax({
+            url: downloadUrl,
+            method: 'POST',
+            data: { pin: pin },
+            xhrFields: {
+                responseType: 'blob'
+            },
+            
+            success: function(data, status, xhr) {
+                var disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    var filename = disposition.split('filename=')[1].replace(/"/g, '');
+                    var blob = new Blob([data], {type: xhr.getResponseHeader('Content-Type')});
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename || 'data.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+
+                    // إغلاق المودال بعد التحميل
+                    var pinModalEl = document.getElementById('pinModal');
+                    var modal = bootstrap.Modal.getInstance('pinModal');
+                    if (modal) modal.hide();
+
+                    // تنظيف رسالة الخطأ في حال ظهرت مسبقًا
+                    $('#errorAlert').text('').hide().removeClass('show');
+                } else {
+                    showModalError('حدث خطأ غير متوقع.');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 400) {
+        // إذا كان الخطأ 400 (Bad Request) فهذا يعني أن كلمة السر خاطئة
+                    showModalError("❌ كلمة السر غير صحيحة!");
+                } else {
+        // لأي خطأ آخر نعرض رسالة عامة
+                    showModalError("حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.");
+                }
+            }
+
+
+        });
+    });
+
+    // دالة عرض رسالة الخطأ
+    function showModalError(msg) {
+       console.log("عرض رسالة الخطأ:", msg);
+       $('#errorAlert').html(msg).show().addClass('show');
+    
+    //var pinModalEl = document.getElementById('pinModal');
+    var modal = bootstrap.Modal.getInstance(document.getElementById('pinModal'));
+    if (!modal) {
+        modal = new bootstrap.Modal(document.getElementById('pinModal'));
+        modal.show();
+    }
+    // إخفاء أوتوماتيكي بعد 5 ثواني
+    clearTimeout(window._modalErrorTimeout);
+    window._modalErrorTimeout = setTimeout(function() {
+        $('#errorAlert').fadeOut(300, function(){
+            $(this).removeClass('show').hide();
+        });
+    }, 5000);
+}
+
+
+
+    // DataTable init
+    $('#victimsTable').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+        },
+        info: "",
+        dom: 'lrtip'
+    });
+});
+</script>
+
+</body>
+</html>

