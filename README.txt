@@ -30,8 +30,6 @@ Gophishهذا المشروع يمثل صفحة تسجيل دخول وهمية م
 - **Landing Page**: عند إنشاء حملة في Gophish ضع الرابط:
 https://<ngrok-url>/login?e={{.Email}}
 
-https://90c0aaa10b3c.ngrok-free.app/login?e={{.Email}}
-
 
 - **Webhook**: لإرسال البيانات مباشرةً إلى Flask بدلاً من الاحتفاظ بها في Gophish:
 1. في صفحة Webhook داخل Gophish ضع:
@@ -78,3 +76,4 @@ python scripts/update-phone.py
   - كلمة المرور للمشرف
 - إذا كان المشرف موجود مسبقًا، لن يتم إنشاءه مرة أخرى.
 - بعد نجاح العملية، يمكن تسجيل الدخول بلوحة التحكم باستخدام الحساب الجديد.
+
